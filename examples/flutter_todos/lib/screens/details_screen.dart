@@ -1,16 +1,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_todos/models/models.dart';
 import 'package:todos_app_core/todos_app_core.dart';
 import 'package:flutter_todos/blocs/todos/todos.dart';
+import 'package:flutter_todos/extensions/extensions.dart';
 import 'package:flutter_todos/screens/screens.dart';
 import 'package:flutter_todos/flutter_todos_keys.dart';
 
 class DetailsScreen extends StatelessWidget {
-  final String id;
+  const DetailsScreen({
+    Key? key,
+    required this.id,
+  }) : super(key: key ?? ArchSampleKeys.todoDetailsScreen);
 
-  DetailsScreen({Key key, @required this.id})
-      : super(key: key ?? ArchSampleKeys.todoDetailsScreen);
+  static Route<Todo> route({required String id}) {
+    return MaterialPageRoute(
+      builder: (_) {
+        return DetailsScreen(id: id);
+      },
+    );
+  }
+
+  final String id;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +30,8 @@ class DetailsScreen extends StatelessWidget {
       builder: (context, state) {
         final todo = (state as TodosLoadSuccess)
             .todos
-            .firstWhere((todo) => todo.id == id, orElse: () => null);
+            .firstOrNullWhere((todo) => todo.id == id);
+
         final localizations = ArchSampleLocalizations.of(context);
         return Scaffold(
           appBar: AppBar(
@@ -27,35 +40,36 @@ class DetailsScreen extends StatelessWidget {
               IconButton(
                 tooltip: localizations.deleteTodo,
                 key: ArchSampleKeys.deleteTodoButton,
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () {
-                  BlocProvider.of<TodosBloc>(context).add(TodoDeleted(todo));
-                  Navigator.pop(context, todo);
+                  BlocProvider.of<TodosBloc>(context).add(TodoDeleted(todo!));
+                  Navigator.of(context).pop(todo);
                 },
               )
             ],
           ),
           body: todo == null
-              ? Container(key: FlutterTodosKeys.emptyDetailsContainer)
+              ? const SizedBox(key: FlutterTodosKeys.emptyDetailsContainer)
               : Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: ListView(
                     children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(right: 8.0),
+                            padding: const EdgeInsets.only(right: 8),
                             child: Checkbox(
-                                key: FlutterTodosKeys.detailsScreenCheckBox,
-                                value: todo.complete,
-                                onChanged: (_) {
-                                  BlocProvider.of<TodosBloc>(context).add(
-                                    TodoUpdated(
-                                      todo.copyWith(complete: !todo.complete),
-                                    ),
-                                  );
-                                }),
+                              key: FlutterTodosKeys.detailsScreenCheckBox,
+                              value: todo.complete,
+                              onChanged: (_) {
+                                BlocProvider.of<TodosBloc>(context).add(
+                                  TodoUpdated(
+                                    todo.copyWith(complete: !todo.complete),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                           Expanded(
                             child: Column(
@@ -65,9 +79,9 @@ class DetailsScreen extends StatelessWidget {
                                   tag: '${todo.id}__heroTag',
                                   child: Container(
                                     width: MediaQuery.of(context).size.width,
-                                    padding: EdgeInsets.only(
-                                      top: 8.0,
-                                      bottom: 16.0,
+                                    padding: const EdgeInsets.only(
+                                      top: 8,
+                                      bottom: 16,
                                     ),
                                     child: Text(
                                       todo.task,
@@ -93,29 +107,25 @@ class DetailsScreen extends StatelessWidget {
           floatingActionButton: FloatingActionButton(
             key: ArchSampleKeys.editTodoFab,
             tooltip: localizations.editTodo,
-            child: Icon(Icons.edit),
             onPressed: todo == null
                 ? null
                 : () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return AddEditScreen(
-                            key: ArchSampleKeys.editTodoScreen,
-                            onSave: (task, note) {
-                              BlocProvider.of<TodosBloc>(context).add(
-                                TodoUpdated(
-                                  todo.copyWith(task: task, note: note),
-                                ),
-                              );
-                            },
-                            isEditing: true,
-                            todo: todo,
+                      AddEditScreen.route(
+                        key: ArchSampleKeys.editTodoScreen,
+                        onSave: (task, note) {
+                          BlocProvider.of<TodosBloc>(context).add(
+                            TodoUpdated(
+                              todo.copyWith(task: task, note: note),
+                            ),
                           );
                         },
+                        isEditing: true,
+                        todo: todo,
                       ),
                     );
                   },
+            child: const Icon(Icons.edit),
           ),
         );
       },

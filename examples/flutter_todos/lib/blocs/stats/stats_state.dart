@@ -10,16 +10,19 @@ abstract class StatsState extends Equatable {
 class StatsLoadInProgress extends StatsState {}
 
 class StatsLoadSuccess extends StatsState {
+  const StatsLoadSuccess(this.numActive, this.numCompleted);
+
   final int numActive;
   final int numCompleted;
-
-  const StatsLoadSuccess(this.numActive, this.numCompleted);
 
   @override
   List<Object> get props => [numActive, numCompleted];
 
   @override
   String toString() {
-    return 'StatsLoadSuccess { numActive: $numActive, numCompleted: $numCompleted }';
+    return 'StatsLoadSuccess { '
+        'numActive: $numActive, '
+        'numCompleted: $numCompleted, '
+        '}';
   }
 }

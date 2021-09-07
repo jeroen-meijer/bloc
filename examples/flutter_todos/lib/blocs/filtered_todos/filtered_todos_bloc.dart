@@ -1,15 +1,11 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:flutter_todos/blocs/filtered_todos/filtered_todos.dart';
 import 'package:flutter_todos/blocs/todos/todos.dart';
 import 'package:flutter_todos/models/models.dart';
 
 class FilteredTodosBloc extends Bloc<FilteredTodosEvent, FilteredTodosState> {
-  final TodosBloc todosBloc;
-  StreamSubscription todosSubscription;
-
-  FilteredTodosBloc({@required this.todosBloc})
+  FilteredTodosBloc({required this.todosBloc})
       : super(
           todosBloc.state is TodosLoadSuccess
               ? FilteredTodosLoadSuccess(
@@ -24,6 +20,9 @@ class FilteredTodosBloc extends Bloc<FilteredTodosEvent, FilteredTodosState> {
       }
     });
   }
+
+  final TodosBloc todosBloc;
+  late StreamSubscription<TodosState> todosSubscription;
 
   @override
   Stream<FilteredTodosState> mapEventToState(FilteredTodosEvent event) async* {

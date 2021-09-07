@@ -8,9 +8,14 @@ import 'package:flutter_todos/widgets/widgets.dart';
 import 'package:flutter_todos/screens/screens.dart';
 import 'package:flutter_todos/flutter_todos_keys.dart';
 
-class FilteredTodos extends StatelessWidget {
-  FilteredTodos({Key key}) : super(key: key);
+class FilteredTodos extends StatefulWidget {
+  const FilteredTodos({Key? key}) : super(key: key);
 
+  @override
+  _FilteredTodosState createState() => _FilteredTodosState();
+}
+
+class _FilteredTodosState extends State<FilteredTodos> {
   @override
   Widget build(BuildContext context) {
     final localizations = ArchSampleLocalizations.of(context);
@@ -18,7 +23,9 @@ class FilteredTodos extends StatelessWidget {
     return BlocBuilder<FilteredTodosBloc, FilteredTodosState>(
       builder: (context, state) {
         if (state is FilteredTodosLoadInProgress) {
-          return LoadingIndicator(key: ArchSampleKeys.todosLoading);
+          return const LoadingIndicator(
+            key: ArchSampleKeys.todosLoading,
+          );
         } else if (state is FilteredTodosLoadSuccess) {
           final todos = state.filteredTodos;
           return ListView.builder(
@@ -41,11 +48,13 @@ class FilteredTodos extends StatelessWidget {
                   );
                 },
                 onTap: () async {
-                  final removedTodo = await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) {
-                      return DetailsScreen(id: todo.id);
-                    }),
-                  );
+                  final removedTodo = await Navigator.of(context)
+                      .push(DetailsScreen.route(id: todo.id));
+
+                  if (!mounted) {
+                    return;
+                  }
+
                   if (removedTodo != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       DeleteTodoSnackBar(
@@ -67,7 +76,9 @@ class FilteredTodos extends StatelessWidget {
             },
           );
         } else {
-          return Container(key: FlutterTodosKeys.filteredTodosEmptyContainer);
+          return const SizedBox(
+            key: FlutterTodosKeys.filteredTodosEmptyContainer,
+          );
         }
       },
     );

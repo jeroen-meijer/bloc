@@ -5,9 +5,12 @@ import 'package:flutter_todos/blocs/filtered_todos/filtered_todos.dart';
 import 'package:flutter_todos/models/models.dart';
 
 class FilterButton extends StatelessWidget {
-  final bool visible;
+  const FilterButton({
+    Key? key,
+    required this.visible,
+  }) : super(key: key);
 
-  FilterButton({this.visible, Key key}) : super(key: key);
+  final bool visible;
 
   @override
   Widget build(BuildContext context) {
@@ -15,42 +18,43 @@ class FilterButton extends StatelessWidget {
     final activeStyle = Theme.of(context)
         .textTheme
         .bodyText2
-        .copyWith(color: Theme.of(context).accentColor);
+        ?.copyWith(color: Theme.of(context).accentColor);
+
     return BlocBuilder<FilteredTodosBloc, FilteredTodosState>(
-        builder: (context, state) {
-      final button = _Button(
-        onSelected: (filter) {
-          BlocProvider.of<FilteredTodosBloc>(context)
-              .add(FilterUpdated(filter));
-        },
-        activeFilter: state is FilteredTodosLoadSuccess
-            ? state.activeFilter
-            : VisibilityFilter.all,
-        activeStyle: activeStyle,
-        defaultStyle: defaultStyle,
-      );
-      return AnimatedOpacity(
-        opacity: visible ? 1.0 : 0.0,
-        duration: Duration(milliseconds: 150),
-        child: visible ? button : IgnorePointer(child: button),
-      );
-    });
+      builder: (context, state) {
+        final button = _Button(
+          onSelected: (filter) {
+            context.read<FilteredTodosBloc>().add(FilterUpdated(filter));
+          },
+          activeFilter: state is FilteredTodosLoadSuccess
+              ? state.activeFilter
+              : VisibilityFilter.all,
+          activeStyle: activeStyle,
+          defaultStyle: defaultStyle,
+        );
+        return AnimatedOpacity(
+          opacity: visible ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 150),
+          child: visible ? button : IgnorePointer(child: button),
+        );
+      },
+    );
   }
 }
 
 class _Button extends StatelessWidget {
   const _Button({
-    Key key,
-    @required this.onSelected,
-    @required this.activeFilter,
-    @required this.activeStyle,
-    @required this.defaultStyle,
+    Key? key,
+    required this.onSelected,
+    required this.activeFilter,
+    required this.activeStyle,
+    required this.defaultStyle,
   }) : super(key: key);
 
   final PopupMenuItemSelected<VisibilityFilter> onSelected;
   final VisibilityFilter activeFilter;
-  final TextStyle activeStyle;
-  final TextStyle defaultStyle;
+  final TextStyle? activeStyle;
+  final TextStyle? defaultStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +94,7 @@ class _Button extends StatelessWidget {
           ),
         ),
       ],
-      icon: Icon(Icons.filter_list),
+      icon: const Icon(Icons.filter_list),
     );
   }
 }

@@ -11,19 +11,22 @@ abstract class FilteredTodosState extends Equatable {
 class FilteredTodosLoadInProgress extends FilteredTodosState {}
 
 class FilteredTodosLoadSuccess extends FilteredTodosState {
-  final List<Todo> filteredTodos;
-  final VisibilityFilter activeFilter;
-
   const FilteredTodosLoadSuccess(
     this.filteredTodos,
     this.activeFilter,
   );
+
+  final List<Todo> filteredTodos;
+  final VisibilityFilter activeFilter;
 
   @override
   List<Object> get props => [filteredTodos, activeFilter];
 
   @override
   String toString() {
-    return 'FilteredTodosLoadSuccess { filteredTodos: $filteredTodos, activeFilter: $activeFilter }';
+    return 'FilteredTodosLoadSuccess { '
+        'filteredTodos: $filteredTodos, '
+        'activeFilter: $activeFilter, '
+        '}';
   }
 }

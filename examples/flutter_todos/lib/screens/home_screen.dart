@@ -7,6 +7,8 @@ import 'package:flutter_todos/localization.dart';
 import 'package:flutter_todos/models/models.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TabBloc, AppTab>(
@@ -16,17 +18,18 @@ class HomeScreen extends StatelessWidget {
             title: Text(FlutterBlocLocalizations.of(context).appTitle),
             actions: [
               FilterButton(visible: activeTab == AppTab.todos),
-              ExtraActions(),
+              const ExtraActions(),
             ],
           ),
-          body: activeTab == AppTab.todos ? FilteredTodos() : Stats(),
+          body:
+              activeTab == AppTab.todos ? const FilteredTodos() : const Stats(),
           floatingActionButton: FloatingActionButton(
             key: ArchSampleKeys.addTodoFab,
             onPressed: () {
               Navigator.pushNamed(context, ArchSampleRoutes.addTodo);
             },
-            child: Icon(Icons.add),
             tooltip: ArchSampleLocalizations.of(context).addTodo,
+            child: const Icon(Icons.add),
           ),
           bottomNavigationBar: TabSelector(
             activeTab: activeTab,

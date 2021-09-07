@@ -8,12 +8,12 @@ abstract class TodosEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class TodosLoaded extends TodosEvent {}
+class TodosLoadRequested extends TodosEvent {}
 
 class TodoAdded extends TodosEvent {
-  final Todo todo;
-
   const TodoAdded(this.todo);
+
+  final Todo todo;
 
   @override
   List<Object> get props => [todo];
@@ -23,9 +23,9 @@ class TodoAdded extends TodosEvent {
 }
 
 class TodoUpdated extends TodosEvent {
-  final Todo todo;
-
   const TodoUpdated(this.todo);
+
+  final Todo todo;
 
   @override
   List<Object> get props => [todo];
@@ -35,9 +35,9 @@ class TodoUpdated extends TodosEvent {
 }
 
 class TodoDeleted extends TodosEvent {
-  final Todo todo;
-
   const TodoDeleted(this.todo);
+
+  final Todo todo;
 
   @override
   List<Object> get props => [todo];

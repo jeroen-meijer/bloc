@@ -6,9 +6,9 @@ abstract class FilteredTodosEvent extends Equatable {
 }
 
 class FilterUpdated extends FilteredTodosEvent {
-  final VisibilityFilter filter;
-
   const FilterUpdated(this.filter);
+
+  final VisibilityFilter filter;
 
   @override
   List<Object> get props => [filter];
@@ -18,9 +18,9 @@ class FilterUpdated extends FilteredTodosEvent {
 }
 
 class TodosUpdated extends FilteredTodosEvent {
-  final List<Todo> todos;
-
   const TodosUpdated(this.todos);
+
+  final List<Todo> todos;
 
   @override
   List<Object> get props => [todos];

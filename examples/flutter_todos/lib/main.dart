@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:bloc/bloc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,31 +12,33 @@ import 'package:flutter_todos/screens/screens.dart';
 
 void main() {
   // We can set a Bloc's observer to an instance of `SimpleBlocObserver`.
-  // This will allow us to handle all transitions and errors in SimpleBlocObserver.
+  // This will allow us to handle all transitions and errors in
+  // the SimpleBlocObserver.
   Bloc.observer = SimpleBlocObserver();
   runApp(
     BlocProvider(
       create: (context) {
         return TodosBloc(
           todosRepository: const TodosRepositoryFlutter(
-            fileStorage: const FileStorage(
+            fileStorage: FileStorage(
               '__flutter_bloc_app__',
               getApplicationDocumentsDirectory,
             ),
           ),
-        )..add(TodosLoaded());
+        )..add(TodosLoadRequested());
       },
-      child: TodosApp(),
+      child: const TodosApp(),
     ),
   );
 }
 
 class TodosApp extends StatelessWidget {
+  const TodosApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: FlutterBlocLocalizations().appTitle,
-      theme: ArchSampleTheme.theme,
+      theme: ArchSampleTheme.theme as ThemeData,
       localizationsDelegates: [
         ArchSampleLocalizationsDelegate(),
         FlutterBlocLocalizationsDelegate(),
@@ -53,12 +56,24 @@ class TodosApp extends StatelessWidget {
                 ),
               ),
               BlocProvider<StatsBloc>(
-                create: (context) => StatsBloc(
-                  todosBloc: BlocProvider.of<TodosBloc>(context),
-                ),
+                create: (context) => StatsBloc(),
               ),
             ],
-            child: HomeScreen(),
+            child: MultiBlocListener(
+              listeners: [
+                BlocListener<TodosBloc, TodosState>(
+                  listenWhen: (previous, current) =>
+                      current is TodosLoadSuccess &&
+                      (previous is! TodosLoadSuccess ||
+                          !listEquals(previous.todos, current.todos)),
+                  listener: (context, state) {
+                    BlocProvider.of<StatsBloc>(context)
+                        .add(StatsUpdated((state as TodosLoadSuccess).todos));
+                  },
+                ),
+              ],
+              child: const HomeScreen(),
+            ),
           );
         },
         ArchSampleRoutes.addTodo: (context) {

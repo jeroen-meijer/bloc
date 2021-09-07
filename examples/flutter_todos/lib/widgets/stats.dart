@@ -8,14 +8,14 @@ import 'package:flutter_todos/widgets/widgets.dart';
 import 'package:flutter_todos/flutter_todos_keys.dart';
 
 class Stats extends StatelessWidget {
-  Stats({Key key}) : super(key: key);
+  const Stats({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StatsBloc, StatsState>(
       builder: (context, state) {
         if (state is StatsLoadInProgress) {
-          return LoadingIndicator(
+          return const LoadingIndicator(
             key: FlutterTodosKeys.statsLoadInProgressIndicator,
           );
         } else if (state is StatsLoadSuccess) {
@@ -24,14 +24,14 @@ class Stats extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
                     ArchSampleLocalizations.of(context).completedTodos,
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(bottom: 24.0),
+                  padding: const EdgeInsets.only(bottom: 24),
                   child: Text(
                     '${state.numCompleted}',
                     key: ArchSampleKeys.statsNumCompleted,
@@ -39,16 +39,16 @@ class Stats extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
+                  padding: const EdgeInsets.only(bottom: 8),
                   child: Text(
                     ArchSampleLocalizations.of(context).activeTodos,
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(bottom: 24.0),
+                  padding: const EdgeInsets.only(bottom: 24),
                   child: Text(
-                    "${state.numActive}",
+                    '${state.numActive}',
                     key: ArchSampleKeys.statsNumActive,
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
@@ -57,7 +57,7 @@ class Stats extends StatelessWidget {
             ),
           );
         } else {
-          return Container(key: FlutterTodosKeys.emptyStatsContainer);
+          return const SizedBox(key: FlutterTodosKeys.emptyStatsContainer);
         }
       },
     );

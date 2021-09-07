@@ -4,13 +4,25 @@ import 'package:flutter/material.dart';
 
 class FlutterBlocLocalizations {
   static FlutterBlocLocalizations of(BuildContext context) {
-    return Localizations.of<FlutterBlocLocalizations>(
+    final localizations = Localizations.of<FlutterBlocLocalizations>(
       context,
       FlutterBlocLocalizations,
     );
+
+    if (localizations == null) {
+      throw StateError(
+        'FlutterBlocLocalizations.of(context) returned null.\n'
+        'No FlutterBlocLocalizations ancestor could be found in the widget '
+        'tree for context $context.\n'
+        'Try passing FlutterBlocLocalizations.delegate to the top-level '
+        'widget.',
+      );
+    }
+
+    return localizations;
   }
 
-  String get appTitle => "Flutter Todos";
+  String get appTitle => 'Flutter Todos';
 }
 
 class FlutterBlocLocalizationsDelegate
@@ -24,5 +36,5 @@ class FlutterBlocLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      locale.languageCode.toLowerCase().contains("en");
+      locale.languageCode.toLowerCase().contains('en');
 }

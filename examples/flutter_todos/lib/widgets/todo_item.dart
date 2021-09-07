@@ -4,18 +4,18 @@ import 'package:todos_app_core/todos_app_core.dart';
 import 'package:flutter_todos/models/models.dart';
 
 class TodoItem extends StatelessWidget {
-  final DismissDirectionCallback onDismissed;
-  final GestureTapCallback onTap;
-  final ValueChanged<bool> onCheckboxChanged;
-  final Todo todo;
-
-  TodoItem({
-    Key key,
-    @required this.onDismissed,
-    @required this.onTap,
-    @required this.onCheckboxChanged,
-    @required this.todo,
+  const TodoItem({
+    Key? key,
+    required this.todo,
+    required this.onDismissed,
+    required this.onTap,
+    required this.onCheckboxChanged,
   }) : super(key: key);
+
+  final Todo todo;
+  final GestureTapCallback onTap;
+  final DismissDirectionCallback onDismissed;
+  final ValueChanged<bool?> onCheckboxChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class TodoItem extends StatelessWidget {
         ),
         title: Hero(
           tag: '${todo.id}__heroTag',
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Text(
               todo.task,
@@ -40,15 +40,15 @@ class TodoItem extends StatelessWidget {
             ),
           ),
         ),
-        subtitle: todo.note.isNotEmpty
-            ? Text(
+        subtitle: todo.note.isEmpty
+            ? null
+            : Text(
                 todo.note,
                 key: ArchSampleKeys.todoItemNote(todo.id),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.subtitle1,
-              )
-            : null,
+              ),
       ),
     );
   }

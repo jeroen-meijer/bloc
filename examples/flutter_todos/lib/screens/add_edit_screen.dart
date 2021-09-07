@@ -6,16 +6,35 @@ import 'package:flutter_todos/models/models.dart';
 typedef OnSaveCallback = Function(String task, String note);
 
 class AddEditScreen extends StatefulWidget {
-  final bool isEditing;
-  final OnSaveCallback onSave;
-  final Todo todo;
-
-  AddEditScreen({
-    Key key,
-    @required this.onSave,
-    @required this.isEditing,
+  const AddEditScreen({
+    Key? key,
+    required this.onSave,
+    required this.isEditing,
     this.todo,
-  }) : super(key: key ?? ArchSampleKeys.addTodoScreen);
+  })  : assert(isEditing == false || todo != null),
+        super(key: key ?? ArchSampleKeys.addTodoScreen);
+
+  static Route<void> route({
+    Key? key,
+    required OnSaveCallback onSave,
+    required bool isEditing,
+    Todo? todo,
+  }) {
+    return MaterialPageRoute(
+      builder: (_) {
+        return AddEditScreen(
+          key: key,
+          onSave: onSave,
+          isEditing: isEditing,
+          todo: todo,
+        );
+      },
+    );
+  }
+
+  final OnSaveCallback onSave;
+  final bool isEditing;
+  final Todo? todo;
 
   @override
   _AddEditScreenState createState() => _AddEditScreenState();
@@ -24,10 +43,8 @@ class AddEditScreen extends StatefulWidget {
 class _AddEditScreenState extends State<AddEditScreen> {
   static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  String _task;
-  String _note;
-
-  bool get isEditing => widget.isEditing;
+  var _task = '';
+  var _note = '';
 
   @override
   Widget build(BuildContext context) {
@@ -37,56 +54,61 @@ class _AddEditScreenState extends State<AddEditScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isEditing ? localizations.editTodo : localizations.addTodo,
+          widget.isEditing ? localizations.editTodo : localizations.addTodo,
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: ListView(
             children: [
               TextFormField(
-                initialValue: isEditing ? widget.todo.task : '',
+                initialValue: widget.isEditing ? widget.todo!.task : '',
                 key: ArchSampleKeys.taskField,
-                autofocus: !isEditing,
+                autofocus: !widget.isEditing,
                 style: textTheme.headline5,
                 decoration: InputDecoration(
                   hintText: localizations.newTodoHint,
                 ),
                 validator: (val) {
-                  return val.trim().isEmpty
-                      ? localizations.emptyTodoError
-                      : null;
+                  if ((val ?? '').trim().isEmpty) {
+                    return localizations.emptyTodoError;
+                  } else {
+                    return null;
+                  }
                 },
-                onSaved: (value) => _task = value,
+                onSaved: (value) => _task = value ?? '',
               ),
               TextFormField(
-                initialValue: isEditing ? widget.todo.note : '',
+                initialValue: widget.isEditing ? widget.todo!.note : '',
                 key: ArchSampleKeys.noteField,
                 maxLines: 10,
                 style: textTheme.subtitle1,
                 decoration: InputDecoration(
                   hintText: localizations.notesHint,
                 ),
-                onSaved: (value) => _note = value,
+                onSaved: (value) => _note = value ?? '',
               )
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        key:
-            isEditing ? ArchSampleKeys.saveTodoFab : ArchSampleKeys.saveNewTodo,
-        tooltip: isEditing ? localizations.saveChanges : localizations.addTodo,
-        child: Icon(isEditing ? Icons.check : Icons.add),
+        key: widget.isEditing
+            ? ArchSampleKeys.saveTodoFab
+            : ArchSampleKeys.saveNewTodo,
+        tooltip: widget.isEditing
+            ? localizations.saveChanges
+            : localizations.addTodo,
         onPressed: () {
-          if (_formKey.currentState.validate()) {
-            _formKey.currentState.save();
+          if (_formKey.currentState!.validate()) {
+            _formKey.currentState!.save();
             widget.onSave(_task, _note);
-            Navigator.pop(context);
+            Navigator.of(context).pop();
           }
         },
+        child: Icon(widget.isEditing ? Icons.check : Icons.add),
       ),
     );
   }

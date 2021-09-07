@@ -8,17 +8,16 @@ import 'package:flutter_todos/models/models.dart';
 import 'package:flutter_todos/flutter_todos_keys.dart';
 
 class ExtraActions extends StatelessWidget {
-  ExtraActions({Key key}) : super(key: ArchSampleKeys.extraActionsButton);
+  const ExtraActions({Key? key})
+      : super(key: key ?? ArchSampleKeys.extraActionsButton);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TodosBloc, TodosState>(
       builder: (context, state) {
         if (state is TodosLoadSuccess) {
-          bool allComplete =
-              (BlocProvider.of<TodosBloc>(context).state as TodosLoadSuccess)
-                  .todos
-                  .every((todo) => todo.complete);
+          final allComplete = state.todos.every((todo) => todo.complete);
+
           return PopupMenuButton<ExtraAction>(
             key: FlutterTodosKeys.extraActionsPopupMenuButton,
             onSelected: (action) {
@@ -51,7 +50,7 @@ class ExtraActions extends StatelessWidget {
             ],
           );
         }
-        return Container(key: FlutterTodosKeys.extraActionsEmptyContainer);
+        return const SizedBox(key: FlutterTodosKeys.extraActionsEmptyContainer);
       },
     );
   }

@@ -4,17 +4,17 @@ version: 1.0.0+1
 publish_to: none
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=2.13.0 <3.0.0"
 
 dependencies:
-  flutter:
-    sdk: flutter
   bloc:
     path: ../../packages/bloc
-  equatable: ^2.0.0
+  equatable: ^2.0.3
+  flutter:
+    sdk: flutter
   flutter_bloc:
     path: ../../packages/flutter_bloc
-  meta: ^1.3.0
+  path_provider: ^2.0.3
 
 dependency_overrides:
   bloc:
@@ -23,19 +23,22 @@ dependency_overrides:
     path: ../../packages/flutter_bloc
   todos_app_core:
     git:
-      url: https://github.com/felangel/flutter_architecture_samples
+      url: https://github.com/jeroen-meijer/flutter_architecture_samples
       path: todos_app_core
-      ref: rxdart/0.23.0
+      ref: feat/todos-nnbd
   todos_repository_core:
     git:
-      url: https://github.com/felangel/flutter_architecture_samples
+      url: https://github.com/jeroen-meijer/flutter_architecture_samples
       path: todos_repository_core
-      ref: rxdart/0.23.0
+      ref: feat/todos-nnbd
   todos_repository_simple:
     git:
-      url: https://github.com/felangel/flutter_architecture_samples
+      url: https://github.com/jeroen-meijer/flutter_architecture_samples
       path: todos_repository_simple
-      ref: rxdart/0.23.0
+      ref: feat/todos-nnbd
+
+dev_dependencies:
+  very_good_analysis: ^2.3.0
 
 flutter:
   uses-material-design: true

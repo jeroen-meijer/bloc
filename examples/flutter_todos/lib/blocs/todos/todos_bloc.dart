@@ -1,19 +1,18 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:flutter_todos/blocs/todos/todos.dart';
 import 'package:flutter_todos/models/models.dart';
 import 'package:todos_repository_simple/todos_repository_simple.dart';
 
 class TodosBloc extends Bloc<TodosEvent, TodosState> {
-  final TodosRepositoryFlutter todosRepository;
+  TodosBloc({required this.todosRepository}) : super(TodosLoadInProgress());
 
-  TodosBloc({@required this.todosRepository}) : super(TodosLoadInProgress());
+  final TodosRepositoryFlutter todosRepository;
 
   @override
   Stream<TodosState> mapEventToState(TodosEvent event) async* {
-    if (event is TodosLoaded) {
-      yield* _mapTodosLoadedToState();
+    if (event is TodosLoadRequested) {
+      yield* _mapTodosLoadRequestedToState();
     } else if (event is TodoAdded) {
       yield* _mapTodoAddedToState(event);
     } else if (event is TodoUpdated) {
@@ -27,9 +26,9 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
     }
   }
 
-  Stream<TodosState> _mapTodosLoadedToState() async* {
+  Stream<TodosState> _mapTodosLoadRequestedToState() async* {
     try {
-      final todos = await this.todosRepository.loadTodos();
+      final todos = await todosRepository.loadTodos();
       yield TodosLoadSuccess(
         todos.map(Todo.fromEntity).toList(),
       );
@@ -40,21 +39,25 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
 
   Stream<TodosState> _mapTodoAddedToState(TodoAdded event) async* {
     if (state is TodosLoadSuccess) {
-      final List<Todo> updatedTodos =
-          List.from((state as TodosLoadSuccess).todos)..add(event.todo);
+      final updatedTodos = [
+        ...(state as TodosLoadSuccess).todos,
+        event.todo,
+      ];
+
       yield TodosLoadSuccess(updatedTodos);
-      _saveTodos(updatedTodos);
+      await _saveTodos(updatedTodos);
     }
   }
 
   Stream<TodosState> _mapTodoUpdatedToState(TodoUpdated event) async* {
     if (state is TodosLoadSuccess) {
-      final List<Todo> updatedTodos =
-          (state as TodosLoadSuccess).todos.map((todo) {
-        return todo.id == event.todo.id ? event.todo : todo;
-      }).toList();
+      final updatedTodos = [
+        for (final todo in (state as TodosLoadSuccess).todos)
+          if (todo.id == event.todo.id) event.todo else todo,
+      ];
+
       yield TodosLoadSuccess(updatedTodos);
-      _saveTodos(updatedTodos);
+      await _saveTodos(updatedTodos);
     }
   }
 
@@ -65,31 +68,33 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
           .where((todo) => todo.id != event.todo.id)
           .toList();
       yield TodosLoadSuccess(updatedTodos);
-      _saveTodos(updatedTodos);
+      await _saveTodos(updatedTodos);
     }
   }
 
   Stream<TodosState> _mapToggleAllToState() async* {
     if (state is TodosLoadSuccess) {
-      final allComplete =
-          (state as TodosLoadSuccess).todos.every((todo) => todo.complete);
-      final List<Todo> updatedTodos = (state as TodosLoadSuccess)
-          .todos
+      final state = this.state as TodosLoadSuccess;
+      final allComplete = state.todos.every((todo) => todo.complete);
+
+      final updatedTodos = state.todos
           .map((todo) => todo.copyWith(complete: !allComplete))
           .toList();
+
       yield TodosLoadSuccess(updatedTodos);
-      _saveTodos(updatedTodos);
+      await _saveTodos(updatedTodos);
     }
   }
 
   Stream<TodosState> _mapClearCompletedToState() async* {
     if (state is TodosLoadSuccess) {
-      final List<Todo> updatedTodos = (state as TodosLoadSuccess)
+      final updatedTodos = (state as TodosLoadSuccess)
           .todos
           .where((todo) => !todo.complete)
           .toList();
+
       yield TodosLoadSuccess(updatedTodos);
-      _saveTodos(updatedTodos);
+      await _saveTodos(updatedTodos);
     }
   }
 
